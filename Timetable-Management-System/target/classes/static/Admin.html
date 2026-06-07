@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Institute Admin Panel</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#ecf0f1;
+}
+
+.header{
+background:#2c3e50;
+color:white;
+padding:20px;
+text-align:center;
+font-size:24px;
+}
+
+.menu{
+background:#34495e;
+padding:10px;
+text-align:center;
+}
+
+.menu button{
+padding:10px 20px;
+margin:5px;
+border:none;
+background:#1abc9c;
+color:white;
+cursor:pointer;
+border-radius:5px;
+font-size:14px;
+}
+
+.menu button:hover{
+background:#16a085;
+}
+
+.container{
+padding:30px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:8px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+margin-bottom:20px;
+}
+
+input{
+padding:8px;
+margin:5px;
+border:1px solid #ccc;
+border-radius:4px;
+}
+
+button.save{
+background:#27ae60;
+color:white;
+border:none;
+padding:8px 15px;
+border-radius:4px;
+cursor:pointer;
+}
+
+button.delete{
+background:#e74c3c;
+color:white;
+border:none;
+padding:6px 10px;
+border-radius:4px;
+cursor:pointer;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:8px;
+text-align:center;
+}
+
+th{
+background:#3498db;
+color:white;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+Institute Timetable Admin Dashboard
+</div>
+
+<div class="menu">
+
+<button onclick="show('students')">Students</button>
+<button onclick="show('teachers')">Teachers</button>
+<button onclick="show('courses')">Courses</button>
+<button onclick="show('batches')">Batches</button>
+<button onclick="show('subjects')">Add Subject</button>
+<button onclick="show('timetable')">Timetable</button>
+<button onclick="show('enrollment')">Enrollment</button>
+</div>
+
+<div class="container">
+
+<!-- STUDENTS -->
+
+<div id="students" class="card">
+
+<h3>Add Student</h3>
+<input id="s_name" placeholder="Student Name">
+<input id="s_email" placeholder="Email">
+<input id="s_password" placeholder="Password">
+<input id="s_batch" placeholder="Batch ID">
+
+<button class="save" onclick="addStudent()">Add</button>
+
+<hr>
+
+<h3>Students List</h3>
+
+<button onclick="loadStudents()">Load Students</button>
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Email</th>
+<th>Delete</th>
+</tr>
+</thead>
+
+<tbody id="studentTable"></tbody>
+
+</table>
+
+</div>
+
+<!-- TEACHERS -->
+
+<div id="teachers" class="card" style="display:none">
+
+<h3>Add Teacher</h3>
+
+<input id="t_name" placeholder="Name">
+<input id="t_email" placeholder="Email">
+<input id="t_password" placeholder="Password">
+
+<button class="save" onclick="addTeacher()">Add</button>
+
+<hr>
+
+<h3>Teachers List</h3>
+
+<button onclick="loadTeachers()">Load Teachers</button>
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Email</th>
+<th>Delete</th>
+</tr>
+</thead>
+
+<tbody id="teacherTable"></tbody>
+
+</table>
+
+</div>
+
+<!-- COURSES -->
+
+<div id="courses" class="card" style="display:none">
+
+<h3>Add Course</h3>
+
+<input id="c_name" placeholder="Course Name">
+<input id="c_desc" placeholder="Description">
+
+<button class="save" onclick="addCourse()">Add</button>
+
+<hr>
+
+<h3>Courses List</h3>
+
+<button onclick="loadCourses()">Load Courses</button>
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Delete</th>
+</tr>
+</thead>
+
+<tbody id="courseTable"></tbody>
+
+</table>
+
+</div>
+
+<!-- BATCHES -->
+
+<div id="batches" class="card" style="display:none">
+
+<h3>Add Batch</h3>
+
+<input id="b_name" placeholder="Batch Name">
+<input id="b_course" placeholder="Course ID">
+
+<button class="save" onclick="addBatch()">Add</button>
+
+<hr>
+
+<h3>Batches List</h3>
+
+<button onclick="loadBatches()">Load Batches</button>
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Delete</th>
+</tr>
+</thead>
+
+<tbody id="batchTable"></tbody>
+
+</table>
+
+</div>
+
+<!-- TIMETABLE -->
+<!-- SUBJECTS -->
+
+<div id="subjects" class="card" style="display:none">
+
+<h3>Add Subject</h3>
+
+<input id="sub_name" placeholder="Subject Name">
+<input id="sub_duration" placeholder="Duration">
+<input id="sub_course" placeholder="Course ID">
+
+<button class="save" onclick="addSubject()">Add</button>
+
+<hr>
+
+<h3>Subjects List</h3>
+
+<button onclick="loadSubjects()">Load Subjects</button>
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Subject</th>
+<th>Duration</th>
+<th>Delete</th>
+</tr>
+</thead>
+
+<tbody id="subjectTable"></tbody>
+
+</table>
+
+</div>
+<div id="timetable" class="card" style="display:none">
+
+<h3>Create Timetable</h3>
+
+<input id="tt_batch" placeholder="Batch ID">
+<input id="tt_teacher" placeholder="Teacher ID">
+<input id="tt_subject" placeholder="Subject ID">
+<input id="tt_day" placeholder="Day">
+<input id="tt_time" placeholder="Time">
+
+<button class="save" onclick="addTimetable()">Create</button>
+
+<hr>
+
+<h3>Timetable List</h3>
+
+<button onclick="loadTimetable()">Load Timetable</button>
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Batch</th>
+<th>Teacher</th>
+<th>Day</th>
+<th>Time</th>
+<th>Delete</th>
+</tr>
+</thead>
+
+<tbody id="timetableTable"></tbody>
+
+</table>
+</div>
+<!-- ENROLLMENT -->
+
+<div id="enrollment" class="card" style="display:none">
+
+<h3>Student Enrollment</h3>
+
+<button onclick="loadEnrollment()">Load Enrollment</button>
+
+<table>
+
+<thead>
+<tr>
+<th>Enrollment ID</th>
+<th>Student</th>
+<th>Batch</th>
+</tr>
+</thead>
+
+<tbody id="enrollmentTable"></tbody>
+
+</table>
+
+</div>
+</div>
+
+
+
+<script>
+
+function show(id){
+
+document.getElementById("students").style.display="none";
+document.getElementById("teachers").style.display="none";
+document.getElementById("courses").style.display="none";
+document.getElementById("batches").style.display="none";
+document.getElementById("subjects").style.display="none";
+document.getElementById("timetable").style.display="none";
+document.getElementById("enrollment").style.display="none";
+document.getElementById(id).style.display="block";
+
+}
+
+const token = localStorage.getItem("token");
+
+
+/* STUDENT */
+
+async function addStudent(){
+	const name = document.getElementById("s_name").value;
+const email=document.getElementById("s_email").value;
+const password=document.getElementById("s_password").value;
+const batch=document.getElementById("s_batch").value;
+
+await fetch("/user",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+name:name,
+email:email,
+password:password,
+role:"ROLE_USER",
+batch:{id:batch}
+})
+
+});
+
+alert("Student Added");
+
+}
+
+async function loadStudents(){
+
+const res=await fetch("/user",{
+
+headers:{
+"Authorization":"Bearer "+token
+}
+
+});
+
+const data=await res.json();
+
+let rows="";
+
+data.forEach(u=>{
+
+if(u.role==="ROLE_USER"){
+
+rows+=`
+<tr>
+<td>${u.id}</td>
+<td>${u.email}</td>
+<td>
+<button class="delete" onclick="deleteStudent(${u.id})">Delete</button>
+</td>
+</tr>
+`;
+
+}
+
+});
+
+document.getElementById("studentTable").innerHTML=rows;
+
+}
+
+async function deleteStudent(id){
+
+await fetch("/user/"+id,{
+method:"DELETE",
+headers:{
+"Authorization":"Bearer "+token
+}
+});
+
+loadStudents();
+
+}
+
+
+/* TEACHER */
+
+async function addTeacher(){
+
+const name=document.getElementById("t_name").value;
+const email=document.getElementById("t_email").value;
+const password=document.getElementById("t_password").value;
+
+await fetch("/user",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+name:name,
+email:email,
+password:password,
+role:"ROLE_TEACHER"
+
+})
+
+});
+
+alert("Teacher Added");
+
+}
+
+async function loadTeachers(){
+
+const res=await fetch("/user",{
+headers:{
+"Authorization":"Bearer "+token
+}
+});
+
+const data=await res.json();
+
+let rows="";
+
+data.forEach(u=>{
+
+if(u.role==="ROLE_TEACHER"){
+
+rows+=`
+<tr>
+<td>${u.id}</td>
+<td>${u.name}</td>
+<td>${u.email}</td>
+<td>
+<button class="delete" onclick="deleteTeacher(${u.id})">Delete</button>
+</td>
+</tr>
+`;
+
+}
+
+});
+
+document.getElementById("teacherTable").innerHTML=rows;
+
+}
+
+async function deleteTeacher(id){
+
+await fetch("/user/"+id,{
+method:"DELETE",
+headers:{
+"Authorization":"Bearer "+token
+}
+});
+
+loadTeachers();
+
+}
+
+
+/* COURSE */
+
+async function addCourse(){
+
+const name=document.getElementById("c_name").value;
+const desc=document.getElementById("c_desc").value;
+
+await fetch("/api/courses",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+token
+},
+
+body:JSON.stringify({
+
+courseName:name,
+description:desc
+
+})
+
+});
+
+alert("Course Added");
+
+}
+
+async function loadCourses(){
+
+const res=await fetch("/api/courses",{
+headers:{
+"Authorization":"Bearer "+token
+}
+});
+
+const data=await res.json();
+
+let rows="";
+
+data.forEach(c=>{
+
+rows+=`
+<tr>
+<td>${c.id}</td>
+<td>${c.courseName}</td>
+<td>
+<button class="delete" onclick="deleteCourse(${c.id})">Delete</button>
+</td>
+</tr>
+`;
+
+});
+
+document.getElementById("courseTable").innerHTML=rows;
+
+}
+
+async function deleteCourse(id){
+
+await fetch("/api/courses/"+id,{
+method:"DELETE",
+headers:{
+"Authorization":"Bearer "+token
+}
+});
+
+loadCourses();
+
+}
+
+
+/* BATCH */
+
+async function addBatch(){
+
+const name=document.getElementById("b_name").value;
+const course=document.getElementById("b_course").value;
+
+await fetch("/api/batches",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+token
+},
+
+body:JSON.stringify({
+
+name:name,
+course:{id:course}
+
+})
+
+});
+
+alert("Batch Added");
+
+}
+
+async function loadBatches(){
+
+const res=await fetch("/api/batches",{
+headers:{
+"Authorization":"Bearer "+token
+}
+});
+
+const data=await res.json();
+
+let rows="";
+
+data.forEach(b=>{
+
+rows+=`
+<tr>
+<td>${b.id}</td>
+<td>${b.name}</td>
+<td>
+<button class="delete" onclick="deleteBatch(${b.id})">Delete</button>
+</td>
+</tr>
+`;
+
+});
+
+document.getElementById("batchTable").innerHTML=rows;
+
+}
+
+async function deleteBatch(id){
+
+await fetch("/api/batches/"+id,{
+method:"DELETE",
+headers:{
+"Authorization":"Bearer "+token
+}
+});
+
+loadBatches();
+
+}
+/* SUBJECT */
+
+async function addSubject(){
+
+const name=document.getElementById("sub_name").value;
+const duration=document.getElementById("sub_duration").value;
+const course=document.getElementById("sub_course").value;
+
+await fetch("/api/subjects",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+token
+},
+
+body:JSON.stringify({
+
+subjectName:name,
+durationInHours:duration,
+course:{id:course}
+
+})
+
+});
+
+alert("Subject Added");
+
+loadSubjects();
+
+}
+
+async function loadSubjects(){
+
+const res=await fetch("/api/subjects",{
+headers:{
+"Authorization":"Bearer "+token
+}
+});
+
+const data=await res.json();
+
+let rows="";
+
+data.forEach(s=>{
+
+rows+=`
+<tr>
+<td>${s.id}</td>
+<td>${s.subjectName}</td>
+<td>${s.durationInHours}</td>
+<td>
+<button class="delete" onclick="deleteSubject(${s.id})">Delete</button>
+</td>
+</tr>
+`;
+
+});
+
+document.getElementById("subjectTable").innerHTML=rows;
+
+}
+
+async function deleteSubject(id){
+
+await fetch("/api/subjects/"+id,{
+method:"DELETE",
+headers:{
+"Authorization":"Bearer "+token
+}
+});
+
+loadSubjects();
+
+}
+
+/* TIMETABLE */
+
+/* TIMETABLE */
+
+async function addTimetable(){
+
+const batch=document.getElementById("tt_batch").value;
+const teacher=document.getElementById("tt_teacher").value;
+const subject=document.getElementById("tt_subject").value;
+const day=document.getElementById("tt_day").value;
+const time=document.getElementById("tt_time").value;
+
+await fetch("/api/timetable",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+token
+},
+
+body:JSON.stringify({
+
+batch:{id:batch},
+teacher:{id:teacher},
+subject:{id:subject},
+day:day,
+timeSlot:time
+
+})
+
+});
+
+alert("Timetable Added");
+
+loadTimetable();
+
+}
+
+
+
+async function loadTimetable(){
+
+const res=await fetch("/api/timetable",{
+headers:{
+"Authorization":"Bearer "+token
+}
+});
+
+const data=await res.json();
+
+let rows="";
+
+data.forEach((t,index)=>{
+
+rows+=`
+<tr>
+<td>${index+1}</td>
+<td>${t.batch.name}</td>
+<td>${t.teacher.name}</td>
+<td>${t.day}</td>
+<td>${t.timeSlot}</td>
+<td>
+<button class="delete" onclick="deleteTimetable(${t.id})">Delete</button>
+</td>
+</tr>
+`;
+
+});
+
+document.getElementById("timetableTable").innerHTML=rows;
+
+}
+
+
+
+async function deleteTimetable(id){
+
+await fetch("/api/timetable/"+id,{
+method:"DELETE",
+headers:{
+"Authorization":"Bearer "+token
+}
+});
+
+loadTimetable();
+
+}
+/* ENROLLMENT */
+
+async function loadEnrollment(){
+
+const res = await fetch("/user",{
+headers:{
+"Authorization":"Bearer "+token
+}
+});
+
+const data = await res.json();
+
+let rows="";
+let id=1;
+
+data.forEach(u=>{
+
+if(u.role==="ROLE_USER" && u.batch){
+
+rows+=`
+<tr>
+<td>${id++}</td>
+<td>${u.name}</td>
+<td>${u.batch.name}</td>
+</tr>
+`;
+
+}
+
+});
+
+document.getElementById("enrollmentTable").innerHTML=rows;
+
+}
+
+</script>
+
+</body>
+</html>

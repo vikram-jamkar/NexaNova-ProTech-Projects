@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Institute Timetable</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f7;
+padding:30px;
+}
+
+h2{
+text-align:center;
+}
+
+button{
+padding:10px 20px;
+background:#3498db;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#2980b9;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+background:white;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
+}
+
+th{
+background:#2c3e50;
+color:white;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Institute Timetable</h2>
+
+<button onclick="loadTimetable()">Load Timetable</button>
+
+<table>
+
+<thead>
+<tr>
+<th>Batch</th>
+<th>Teacher</th>
+<th>Subject</th>
+<th>Day</th>
+<th>Time</th>
+</tr>
+</thead>
+
+<tbody id="data"></tbody>
+
+</table>
+
+<script>
+
+async function loadTimetable(){
+
+const token = localStorage.getItem("token");
+
+const res = await fetch("/api/timetable",{
+
+headers:{
+"Authorization":"Bearer " + token
+}
+
+});
+
+const data = await res.json();
+
+let rows="";
+
+data.forEach(t=>{
+
+rows+=`
+<tr>
+<td>${t.batch.name}</td>
+<td>${t.teacher.name}</td>
+<td>${t.subject.subjectName}</td>
+<td>${t.day}</td>
+<td>${t.timeSlot}</td>
+</tr>
+`;
+
+});
+
+document.getElementById("data").innerHTML=rows;
+
+}
+
+</script>
+
+</body>
+</html>
