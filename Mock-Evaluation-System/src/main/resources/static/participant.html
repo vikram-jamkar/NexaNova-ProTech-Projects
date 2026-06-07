@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Participant Management</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+
+<h2 class="text-center">Participant Management</h2>
+
+<!-- 🔹 FORM -->
+<input type="hidden" id="pid">
+
+<input id="name" class="form-control mt-2" placeholder="Name">
+<input id="email" class="form-control mt-2" placeholder="Email">
+<input id="batch" class="form-control mt-2" placeholder="Batch ID">
+<input id="tech" class="form-control mt-2" placeholder="Technology ID">
+
+<button onclick="save()" class="btn btn-primary mt-3">Save</button>
+
+<hr>
+
+<!-- 🔹 LOAD -->
+<button onclick="load()" class="btn btn-success">Load Participants</button>
+
+<table class="table table-bordered mt-3">
+<thead class="table-dark">
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Email</th>
+<th>Batch</th>
+<th>Technology</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="data"></tbody>
+
+</table>
+
+</div>
+
+<script>
+
+// 🔥 SAVE (ADD + UPDATE)
+function save(){
+
+let id = document.getElementById("pid").value;
+
+let url = "http://localhost:8080/participants";
+let method = "POST";
+
+if(id){
+url = url + "/" + id;
+method = "PUT";
+}
+
+fetch(url,{
+method:method,
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+name:document.getElementById("name").value,
+email:document.getElementById("email").value,
+batch:{id:document.getElementById("batch").value},
+technology:{id:document.getElementById("tech").value}
+})
+})
+.then(()=>{
+alert("Saved Successfully");
+load();
+clearForm();
+});
+}
+
+// 🔥 LOAD
+function load(){
+fetch("http://localhost:8080/participants")
+.then(res=>res.json())
+.then(list=>{
+let rows="";
+list.forEach(p=>{
+rows+=`
+<tr>
+<td>${p.id}</td>
+<td>${p.name}</td>
+<td>${p.email}</td>
+<td>${p.batch ? p.batch.name : ""}</td>
+<td>${p.technology ? p.technology.name : ""}</td>
+<td>
+<button onclick="edit(${p.id},'${p.name}','${p.email}','${p.batch ? p.batch.id : ""}','${p.technology ? p.technology.id : ""}')" class="btn btn-warning btn-sm">Edit</button>
+<button onclick="del(${p.id})" class="btn btn-danger btn-sm">Delete</button>
+</td>
+</tr>
+`;
+});
+document.getElementById("data").innerHTML=rows;
+});
+}
+
+// 🔥 EDIT
+function edit(id,n,e,b,t){
+document.getElementById("pid").value=id;
+document.getElementById("name").value=n;
+document.getElementById("email").value=e;
+document.getElementById("batch").value=b;
+document.getElementById("tech").value=t;
+}
+
+// 🔥 DELETE
+function del(id){
+if(confirm("Delete this participant?")){
+fetch("http://localhost:8080/participants/"+id,{
+method:"DELETE"
+})
+.then(()=>load());
+}
+}
+
+// 🔥 CLEAR
+function clearForm(){
+document.getElementById("pid").value="";
+document.getElementById("name").value="";
+document.getElementById("email").value="";
+document.getElementById("batch").value="";
+document.getElementById("tech").value="";
+}
+
+</script>
+
+</body>
+</html>
