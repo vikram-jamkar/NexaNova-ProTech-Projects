@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Add Question</title>
+
+<style>
+body{
+    font-family:Arial;
+    background:#f5f5f5;
+}
+
+.container{
+    width:600px;
+    margin:auto;
+    margin-top:50px;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0px 0px 10px gray;
+}
+
+input{
+    width:95%;
+    padding:10px;
+    margin:10px 0;
+}
+
+button{
+    padding:10px 20px;
+    background:blue;
+    color:white;
+    border:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Add Question</h1>
+
+<input type="text" id="question"
+placeholder="Enter Question">
+
+<input type="text" id="option1"
+placeholder="Option 1">
+
+<input type="text" id="option2"
+placeholder="Option 2">
+
+<input type="text" id="option3"
+placeholder="Option 3">
+
+<input type="text" id="option4"
+placeholder="Option 4">
+
+<input type="text" id="correctAnswer"
+placeholder="Correct Answer">
+
+<input type="number" id="topicId"
+placeholder="Topic Id">
+
+<button onclick="saveQuestion()">
+Save Question
+</button>
+
+</div>
+
+<script>
+
+async function saveQuestion(){
+
+    let question =
+    document.getElementById("question").value;
+
+    let option1 =
+    document.getElementById("option1").value;
+
+    let option2 =
+    document.getElementById("option2").value;
+
+    let option3 =
+    document.getElementById("option3").value;
+
+    let option4 =
+    document.getElementById("option4").value;
+
+    let correctAnswer =
+    document.getElementById("correctAnswer").value;
+
+    let topicId =
+    document.getElementById("topicId").value;
+
+    await fetch("http://localhost:8080/saveQuestion",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+            question:question,
+            option1:option1,
+            option2:option2,
+            option3:option3,
+            option4:option4,
+            correctAnswer:correctAnswer,
+
+            topic:{
+                id:topicId
+            }
+
+        })
+
+    });
+
+    alert("Question Saved Successfully");
+}
+
+</script>
+
+</body>
+</html>
