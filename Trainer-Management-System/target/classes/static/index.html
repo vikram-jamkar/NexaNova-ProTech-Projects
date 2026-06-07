@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trainer App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2 { color: #333; }
+        input, button { margin: 5px; padding: 5px; }
+        table { border-collapse: collapse; width: 80%; margin-top: 10px; }
+        table, th, td { border: 1px solid black; }
+        th, td { padding: 8px; text-align: left; }
+        .section { margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <h1>Trainer App</h1>
+
+    <!-- Add Trainer -->
+    <div class="section">
+        <h2>Add Trainer</h2>
+        <input type="text" id="trainerName" placeholder="Name">
+        <input type="number" id="trainerExp" placeholder="Experience">
+        <input type="text" id="trainerSpec" placeholder="Specialization">
+        <input type="text" id="trainerSub" placeholder="Subject">
+        <button onclick="addTrainer()">Add Trainer</button>
+    </div>
+
+    <!-- List Trainers -->
+    <div class="section">
+        <h2>All Trainers</h2>
+        <button onclick="getTrainers()">Refresh List</button>
+        <table id="trainersTable">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Name</th><th>Experience</th><th>Specialization</th><th>Subject</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Update/Delete Trainer -->
+    <div class="section">
+        <h2>Update/Delete Trainer (Optional)</h2>
+        <input type="number" id="updateTrainerId" placeholder="Trainer ID">
+        <input type="text" id="updateTrainerName" placeholder="Name">
+        <input type="number" id="updateTrainerExp" placeholder="Experience">
+        <input type="text" id="updateTrainerSpec" placeholder="Specialization">
+        <input type="text" id="updateTrainerSub" placeholder="Subject">
+        <button onclick="updateTrainer()">Update Trainer</button>
+        <button onclick="deleteTrainer()">Delete Trainer</button>
+    </div>
+
+    <!-- Add Subject -->
+    <div class="section">
+        <h2>Add Subject</h2>
+        <input type="text" id="subjectName" placeholder="Subject Name">
+        <input type="text" id="subjectDesc" placeholder="Description">
+        <button onclick="addSubject()">Add Subject</button>
+    </div>
+
+    <!-- List Subjects -->
+    <div class="section">
+        <h2>All Subjects</h2>
+        <button onclick="getSubjects()">Refresh List</button>
+        <table id="subjectsTable">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Subject Name</th><th>Description</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Update/Delete Subject -->
+    <div class="section">
+        <h2>Update/Delete Subject (Optional)</h2>
+        <input type="number" id="updateSubjectId" placeholder="Subject ID">
+        <input type="text" id="updateSubjectName" placeholder="Subject Name">
+        <button onclick="updateSubject()">Update Subject</button>
+        <button onclick="deleteSubject()">Delete Subject</button>
+    </div>
+
+    <script>
+        const BASE_URL = ""; // backend URL
+
+        // Trainer
+        function addTrainer() {
+            const data = {
+                name: document.getElementById('trainerName').value,
+                experience: parseInt(document.getElementById('trainerExp').value),
+                specialization: document.getElementById('trainerSpec').value,
+                subject: document.getElementById('trainerSub').value
+            };
+
+            fetch(`${BASE_URL}/trainer`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(res => res.json())
+              .then(resp => { alert('Trainer Added'); getTrainers(); })
+              .catch(err => console.error(err));
+        }
+
+        function getTrainers() {
+            fetch(`${BASE_URL}/trainer`)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.querySelector('#trainersTable tbody');
+                tbody.innerHTML = '';
+                data.forEach(t => {
+                    tbody.innerHTML += `<tr>
+                        <td>${t.id}</td>
+                        <td>${t.name}</td>
+                        <td>${t.experience}</td>
+                        <td>${t.specialization}</td>
+                        <td>${t.subject}</td>
+                    </tr>`;
+                });
+            });
+        }
+
+        function updateTrainer() {
+
+            const id = document.getElementById('updateTrainerId').value;
+
+            const data = {
+                name: document.getElementById('updateTrainerName').value,
+                experience: parseInt(document.getElementById('updateTrainerExp').value),
+                specialization: document.getElementById('updateTrainerSpec').value,
+                subject: document.getElementById('updateTrainerSub').value
+            };
+
+            fetch(`${BASE_URL}/trainer/${id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(() => {
+                alert('Trainer Updated');
+                getTrainers();
+            })
+            .catch(err => console.error(err));
+        }
+
+        function deleteTrainer() {
+            const id = document.getElementById('updateTrainerId').value;
+            fetch(`${BASE_URL}/trainer/${id}`, { method: 'DELETE' })
+            .then(() => { alert('Trainer Deleted'); getTrainers(); })
+            .catch(err => console.error(err));
+        }
+
+        // Subject
+        function addSubject() {
+            const data = {
+                subjectName: document.getElementById('subjectName').value,
+                description: document.getElementById('subjectDesc').value
+            };
+
+            fetch(`${BASE_URL}/subject`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(res => res.json())
+              .then(resp => { alert('Subject Added'); getSubjects(); })
+              .catch(err => console.error(err));
+        }
+
+        function getSubjects() {
+            fetch(`${BASE_URL}/subject`)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.querySelector('#subjectsTable tbody');
+                tbody.innerHTML = '';
+                data.forEach(s => {
+                    tbody.innerHTML += `<tr>
+                        <td>${s.id}</td>
+                        <td>${s.subjectName}</td>
+                        <td>${s.description}</td>
+                    </tr>`;
+                });
+            });
+        }
+
+        function updateSubject() {
+            const id = document.getElementById('updateSubjectId').value;
+            const data = { description: document.getElementById('updateSubjectName').value };
+            fetch(`${BASE_URL}/subject/${id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(res => res.json())
+              .then(() => { alert('Subject Updated'); getSubjects(); })
+              .catch(err => console.error(err));
+        }
+
+        function deleteSubject() {
+            const id = document.getElementById('updateSubjectId').value;
+            fetch(`${BASE_URL}/subject/${id}`, { method: 'DELETE' })
+            .then(() => { alert('Subject Deleted'); getSubjects(); })
+            .catch(err => console.error(err));
+        }
+
+        // Load initial data
+        getTrainers();
+        getSubjects();
+    </script>
+</body>
+</html>
