@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Batch Management</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+
+<h2 class="text-center">Batch Management</h2>
+
+<input type="hidden" id="bid">
+
+<input id="name" class="form-control mt-2" placeholder="Batch Name">
+<input id="start" type="date" class="form-control mt-2">
+<input id="end" type="date" class="form-control mt-2">
+
+<button onclick="save()" class="btn btn-primary mt-3">Save</button>
+
+<hr>
+
+<button onclick="load()" class="btn btn-success">Load Batches</button>
+
+<table class="table table-bordered mt-3">
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Start</th>
+<th>End</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="data"></tbody>
+</table>
+
+</div>
+
+<script>
+
+function save(){
+let id = document.getElementById("bid").value;
+
+let url = "http://localhost:8080/batches";
+let method = "POST";
+
+if(id){
+url = "http://localhost:8080/batches/" + id;
+method = "PUT";
+}
+
+fetch(url,{
+method:method,
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+name:document.getElementById("name").value,
+startDate:document.getElementById("start").value,
+endDate:document.getElementById("end").value
+})
+})
+.then(()=>{
+alert("Saved");
+load();
+clearForm();
+});
+}
+
+function load(){
+fetch("http://localhost:8080/batches")
+.then(res=>res.json())
+.then(list=>{
+let rows="";
+list.forEach(b=>{
+rows+=`
+<tr>
+<td>${b.id}</td>
+<td>${b.name}</td>
+<td>${b.startDate||""}</td>
+<td>${b.endDate||""}</td>
+<td>
+<button onclick="edit(${b.id},'${b.name}','${b.startDate}','${b.endDate}')">Edit</button>
+<button onclick="del(${b.id})">Delete</button>
+</td>
+</tr>
+`;
+});
+document.getElementById("data").innerHTML=rows;
+});
+}
+
+function edit(id,n,s,e){
+document.getElementById("bid").value=id;
+document.getElementById("name").value=n;
+document.getElementById("start").value=s;
+document.getElementById("end").value=e;
+}
+
+function del(id){
+fetch("http://localhost:8080/batches/"+id,{
+method:"DELETE"
+}).then(()=>{
+load();
+});
+}
+
+function clearForm(){
+document.getElementById("bid").value="";
+document.getElementById("name").value="";
+document.getElementById("start").value="";
+document.getElementById("end").value="";
+}
+
+</script>
+
+</body>
+</html>

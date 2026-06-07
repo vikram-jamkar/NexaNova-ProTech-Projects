@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f2f2f2;
+margin:0;
+text-align:center;
+}
+
+.header{
+background:#2c3e50;
+color:white;
+padding:20px;
+font-size:24px;
+}
+
+.container{
+margin-top:40px;
+}
+
+button{
+padding:12px 25px;
+margin:10px;
+border:none;
+background:#1abc9c;
+color:white;
+font-size:16px;
+cursor:pointer;
+border-radius:5px;
+}
+
+button:hover{
+background:#16a085;
+}
+
+.logout{
+background:#e74c3c;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+Institute Timetable Dashboard
+</div>
+
+<div class="container">
+
+<a href="admin.html">
+<button id="adminBtn">Admin Panel</button>
+</a>
+
+<a href="timetable.html">
+<button>View Timetable</button>
+</a>
+
+<br><br>
+
+<button onclick="loadUser()">User API</button>
+
+<button id="adminApiBtn" onclick="loadAdmin()">Admin API</button>
+
+<br><br>
+
+<button class="logout" onclick="logout()">Logout</button>
+
+<p id="result"></p>
+
+</div>
+
+<script>
+
+const token = localStorage.getItem("token");
+
+/* ROLE CHECK */
+
+if(token){
+
+const payload = JSON.parse(atob(token.split('.')[1]));
+const role = payload.role;
+
+if(role === "ROLE_USER"){
+
+document.getElementById("adminBtn").style.display="none";
+document.getElementById("adminApiBtn").style.display="none";
+
+}
+
+}
+
+
+/* USER API */
+
+async function loadUser(){
+
+const res = await fetch("/user/user",{
+
+headers:{
+"Authorization":"Bearer "+token
+}
+
+})
+
+document.getElementById("result").innerText = await res.text();
+
+}
+
+
+/* ADMIN API */
+
+async function loadAdmin(){
+
+const res = await fetch("/user/admin",{
+
+headers:{
+"Authorization":"Bearer "+token
+}
+
+})
+
+document.getElementById("result").innerText = await res.text();
+
+}
+
+
+/* LOGOUT */
+
+function logout(){
+
+localStorage.clear()
+
+window.location.href="login.html"
+
+}
+
+</script>
+
+</body>
+</html>
