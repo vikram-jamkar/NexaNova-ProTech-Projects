@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Create Quiz</title>
+
+<style>
+
+body{
+    font-family:Arial;
+    background:#f4f6f9;
+}
+
+.container{
+    width:600px;
+    margin:auto;
+    margin-top:80px;
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0px 0px 10px lightgray;
+}
+
+h1{
+    text-align:center;
+    color:#2c3e50;
+}
+
+input{
+    width:95%;
+    padding:12px;
+    margin-top:10px;
+    margin-bottom:15px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:#28a745;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#218838;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Create Quiz</h1>
+
+<label>Quiz Name</label>
+
+<input
+type="text"
+id="quizName"
+placeholder="Enter Quiz Name">
+
+<label>Question IDs</label>
+
+<input
+type="text"
+id="questionIds"
+placeholder="Example : 1,2,3">
+
+
+
+
+<label>Duration (Minutes)</label>
+
+<input
+type="number"
+id="duration"
+placeholder="Enter Duration">
+
+<label>Quiz Date</label>
+
+<input
+type="date"
+id="quizDate">
+
+<label>Quiz Time</label>
+
+<input
+type="time"
+id="quizTime">
+<button onclick="saveQuiz()">
+Create Quiz
+</button>
+
+</div>
+<script>
+
+async function saveQuiz(){
+
+    let quizName =
+    document.getElementById("quizName").value;
+    let duration =
+    	document.getElementById("duration").value;
+
+    	let quizDate =
+    	document.getElementById("quizDate").value;
+
+    	let quizTime =
+    	document.getElementById("quizTime").value;
+    let ids =
+    document.getElementById("questionIds").value
+    .split(",");
+
+    let questions = [];
+
+    for(let id of ids){
+
+        questions.push({
+
+            id:parseInt(id)
+
+        });
+
+    }
+
+    let response =
+    await fetch(
+    "http://localhost:8080/saveQuiz",
+    {
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+            quizName:quizName,
+            duration:parseInt(duration),
+            quizDate:quizDate,
+            quizTime:quizTime,
+            questions:questions
+
+        })
+    });
+
+    if(response.ok){
+
+        alert("Quiz Created Successfully");
+
+        document.getElementById("quizName").value="";
+        document.getElementById("questionIds").value="";
+
+    }
+    else{
+
+        alert("Quiz Creation Failed");
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
